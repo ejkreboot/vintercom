@@ -19,7 +19,7 @@ export default async function handler(req, res) {
   const { data, error } = await supabase
     .from('room_presence')
     .select('participants')
-    .eq('id', 'mom')
+    .eq('id', 'kiosk')
     .single();
 
   if (error) return res.status(500).json({ error: error.message });

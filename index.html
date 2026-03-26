@@ -606,7 +606,7 @@
       sb.channel('room-presence')
         .on(
           'postgres_changes',
-          { event: 'UPDATE', schema: 'public', table: 'room_presence', filter: 'id=eq.mom' },
+          { event: 'UPDATE', schema: 'public', table: 'room_presence', filter: 'id=eq.kiosk' },
           async (payload) => {
             const count = payload.new.participants;
             if (count > 0 && !kioskCallActive) {
