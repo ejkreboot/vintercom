@@ -609,15 +609,20 @@
           { event: 'UPDATE', schema: 'public', table: 'room_presence', filter: 'id=eq.kiosk' },
           async (payload) => {
             const count = payload.new.participants;
+            console.log('[Realtime] room_presence UPDATE received:', JSON.stringify(payload.new));
             if (count > 0 && !kioskCallActive) {
+              console.log('[Realtime] Incoming call detected, joining room');
               statusEl.classList.add('incoming');
               await kioskJoin(window._roomUrl);
             } else if (count === 0 && kioskCallActive) {
+              console.log('[Realtime] All callers left, ending kiosk call');
               await kioskEnd();
             }
           }
         )
-        .subscribe();
+        .subscribe((status) => {
+          console.log('[Realtime] Subscription status:', status);
+        });
     }
 
     async function kioskJoin(url) {
