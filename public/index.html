@@ -789,22 +789,16 @@
       kioskRoomError.style.display = 'none';
     });
 
-    kioskConfirmBtn.addEventListener('click', async () => {
-      const rn = kioskRoomInput.value.trim();
-      kioskConfirmBtn.disabled = true;
-
+    async function enterKioskMode(rn) {
       let roomInfo;
       try {
         roomInfo = await getRoomInfo(rn);
       } catch (err) {
         console.warn('check-room failed:', err.message);
-        kioskRoomError.style.display = 'block';
-        kioskConfirmBtn.disabled = false;
-        return;
+        return false;
       }
 
       kioskRoomName = rn;
-      kioskModal.classList.remove('visible');
       kioskMode = true;
       callerModeEl.style.display = 'none';
       kioskModeEl.classList.add('active');
@@ -821,7 +815,25 @@
       lastKnownCount = participants;
 
       if (participants > 0) await kioskJoin(roomInfo.roomUrl);
+      return true;
+    }
+
+    kioskConfirmBtn.addEventListener('click', async () => {
+      const rn = kioskRoomInput.value.trim();
+      kioskConfirmBtn.disabled = true;
+
+      kioskModal.classList.remove('visible');
+      const ok = await enterKioskMode(rn);
+      if (!ok) {
+        kioskModal.classList.add('visible');
+        kioskRoomError.style.display = 'block';
+        kioskConfirmBtn.disabled = false;
+      }
     });
+
+    // Auto-enter kiosk mode from ?room= URL parameter
+    const _autoRoom = new URLSearchParams(window.location.search).get('room');
+    if (_autoRoom) enterKioskMode(_autoRoom);
 
     let kioskEnding = false;
     let kioskEndedAt = 0;
